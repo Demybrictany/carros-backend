@@ -2,7 +2,11 @@ const { DataTypes } = require("sequelize");
 const db = require("../db/db");
 
 const CarroPredio = db.define("CarroPredio", {
-  Id_Predio: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  Id_Predio: { 
+    type: DataTypes.INTEGER, 
+    primaryKey: true, 
+    autoIncrement: true 
+  },
 
   Placa: { type: DataTypes.STRING(20), allowNull: false },
   Modelo: { type: DataTypes.STRING(100), allowNull: false },
@@ -17,8 +21,19 @@ const CarroPredio = db.define("CarroPredio", {
   Num_Chasis: { type: DataTypes.STRING(100), allowNull: false },
   Color: { type: DataTypes.STRING(50), allowNull: false },
 
+  Tiempo_Traspaso: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+
+  Fecha_Ingreso: {
+    type: DataTypes.DATE,
+    allowNull: false
+  },
+
   Id_Vendedor: { type: DataTypes.INTEGER, allowNull: false },
   Id_Compra: { type: DataTypes.INTEGER, allowNull: true }
+
 }, {
   tableName: "CarroPredio",
   timestamps: false,

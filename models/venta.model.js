@@ -12,6 +12,10 @@ const Venta = db.define("Venta", {
 
   Porcentaje: { type: DataTypes.DECIMAL(5, 2), allowNull: true },
   Comision: { type: DataTypes.DECIMAL(12, 2), allowNull: true },
+  DiasContrato: {
+  type: DataTypes.INTEGER,
+  allowNull: true
+}
 }, {
   tableName: "Ventas",
   timestamps: false,

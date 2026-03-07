@@ -8,7 +8,6 @@ const Comprador = db.define("Comprador", {
   DPI: { type: DataTypes.STRING(13), allowNull: false },
   Telefono: { type: DataTypes.STRING(20), allowNull: true },
   Foto_DPI: { type: DataTypes.TEXT("long"), allowNull: true },
-  PrecioVenta: { type: DataTypes.DECIMAL(10,2), allowNull: true },
 }, {
   tableName: "Comprador",
   timestamps: false

@@ -41,10 +41,6 @@ const Vendedor = db.define(
       allowNull: true,
     },
 
-    Tiempo_Traspaso: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
-    },
   },
   {
     tableName: "Vendedor",

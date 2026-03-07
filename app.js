@@ -11,7 +11,7 @@ const app = express();
 app.use(cors({
   origin: "http://localhost:3000",
   methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 app.use(express.json({ limit: "50mb" }));
@@ -23,6 +23,7 @@ require("./models/comprador.model");
 require("./models/carropredio.model");
 require("./models/gastos.model");
 require("./models/venta.model");
+require("./models/usuario.model");
 
 
 // Cargar relaciones (AL FINAL)
@@ -39,13 +40,16 @@ app.use("/carros-predio", require("./routes/carropredio.routes"));
 app.use("/gastos", require("./routes/gastos.routes"));
 app.use("/ventas", require("./routes/ventas.routes"));
 app.use("/contrato", require("./routes/contrato.routes"));
-
+app.use("/usuarios", require("./routes/usuarios.routes"));
+app.use("/estadisticas", require("./routes/estadisticas.routes"));
+app.use("/contrato-compra-carro", require("./routes/contratoCompraCarro.routes"));
 //rutas de busqueda 
-app.use("/buscar", require("./routes/buscar.routes"))
+app.use("/", require("./routes/buscar.routes"))
 
-sequelize.sync({ alter: false }).then(() => {
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
     console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
   });
-});
+
+      //console.log("🚀 Servidor corriendo en http://192.168.1.5:3001");
+;
