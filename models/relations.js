@@ -17,7 +17,7 @@ CarroPredio.belongsTo(Vendedor, {
 ========================================== */
 CarroPredio.belongsTo(Comprador, {
   foreignKey: "Id_Compra",
-  as: "Comprador",
+  as: "CompradorCarro",
 });
 
 /* ==========================================
@@ -25,7 +25,7 @@ CarroPredio.belongsTo(Comprador, {
 ========================================== */
 Venta.belongsTo(Comprador, {
   foreignKey: "Id_Compra",
-  as: "Comprador",
+  as: "CompradorVenta",
 });
 
 /* ==========================================

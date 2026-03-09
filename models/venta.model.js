@@ -7,61 +7,48 @@ const Venta = db.define(
     Id_Venta: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
 
     Id_Predio: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
 
     Id_Compra: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
 
     Fecha: {
       type: DataTypes.DATEONLY,
-      allowNull: false
+      allowNull: false,
     },
 
     PrecioVenta: {
       type: DataTypes.DECIMAL(12, 2),
-      allowNull: false
+      allowNull: false,
     },
 
     Porcentaje: {
       type: DataTypes.DECIMAL(5, 2),
-      allowNull: true
+      allowNull: true,
     },
 
     Comision: {
       type: DataTypes.DECIMAL(12, 2),
-      allowNull: true
+      allowNull: true,
     },
 
     DiasContrato: {
       type: DataTypes.INTEGER,
-      allowNull: true
-    }
+      allowNull: true,
+    },
   },
   {
-    tableName: "ventas", // 🔥 ESTE ES EL NOMBRE REAL DE TU TABLA
-    timestamps: false
+    tableName: "ventas",
+    timestamps: false,
   }
 );
-
-const CarroPredio = require("./carropredio.model");
-const Comprador = require("./comprador.model");
-
-Venta.belongsTo(CarroPredio, {
-  foreignKey: "Id_Predio",
-  as: "CarroVenta"
-});
-
-Venta.belongsTo(Comprador, {
-  foreignKey: "Id_Compra",
-  as: "Comprador"
-});
 
 module.exports = Venta;
