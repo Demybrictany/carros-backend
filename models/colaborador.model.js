@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const db = require("../db/db");
 
 const Colaborador = db.define(
-  "Colaborador",
+  "colaborador",
   {
     Id_Colaborador: {
       type: DataTypes.INTEGER,
@@ -23,7 +23,7 @@ const Colaborador = db.define(
     }
   },
   {
-    tableName: "Colaborador",
+    tableName: "colaborador",
     timestamps: false
   }
 );
