@@ -54,9 +54,35 @@ exports.crearVenta = async (req, res) => {
 exports.actualizarVenta = async (req, res) => {
   try {
     const id = req.params.id;
+    const venta = await Venta.findByPk(id);
+    if (!venta) return res.status(404).json({ error: "Venta no encontrada" });
+
+    const prevPredio = venta.Id_Predio;
+    const prevCompra = venta.Id_Compra;
+
     await Venta.update(req.body, { where: { Id_Venta: id } });
+
+    // Si cambia el carro/compra, actualizar el estado del carro
+    const nuevoPredio = req.body.Id_Predio ?? prevPredio;
+    const nuevoCompra = req.body.Id_Compra ?? prevCompra;
+
+    if (nuevoPredio !== prevPredio) {
+      const prevCarro = await CarroPredio.findByPk(prevPredio);
+      if (prevCarro) {
+        prevCarro.Id_Compra = null;
+        await prevCarro.save();
+      }
+    }
+
+    const nuevoCarro = await CarroPredio.findByPk(nuevoPredio);
+    if (nuevoCarro) {
+      nuevoCarro.Id_Compra = nuevoCompra;
+      await nuevoCarro.save();
+    }
+
     res.json({ mensaje: "Venta actualizada" });
   } catch (error) {
+    console.error("Error al actualizar venta:", error);
     res.status(500).json({ error: "Error al actualizar venta" });
   }
 };
@@ -64,9 +90,19 @@ exports.actualizarVenta = async (req, res) => {
 exports.eliminarVenta = async (req, res) => {
   try {
     const id = req.params.id;
+    const venta = await Venta.findByPk(id);
+    if (!venta) return res.status(404).json({ error: "Venta no encontrada" });
+
+    const carro = await CarroPredio.findByPk(venta.Id_Predio);
+    if (carro) {
+      carro.Id_Compra = null;
+      await carro.save();
+    }
+
     await Venta.destroy({ where: { Id_Venta: id } });
     res.json({ mensaje: "Venta eliminada" });
   } catch (error) {
+    console.error("Error al eliminar venta:", error);
     res.status(500).json({ error: "Error al eliminar venta" });
   }
 };
