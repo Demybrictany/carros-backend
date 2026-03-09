@@ -2,14 +2,16 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-
-
 const sequelize = require("./db/db");
 
 const app = express();
 
+// ✅ CORS CORREGIDO (acepta localhost y frontend desplegado)
 app.use(cors({
-  origin: "https://carros-backend.onrender.com",
+  origin: [
+    "http://localhost:3000",
+    "https://carros-backend.onrender.com"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
@@ -24,7 +26,6 @@ require("./models/carropredio.model");
 require("./models/gastos.model");
 require("./models/venta.model");
 require("./models/usuario.model");
-
 
 // Cargar relaciones (AL FINAL)
 require("./models/relations");
@@ -43,13 +44,12 @@ app.use("/contrato", require("./routes/contrato.routes"));
 app.use("/usuarios", require("./routes/usuarios.routes"));
 app.use("/estadisticas", require("./routes/estadisticas.routes"));
 app.use("/contrato-compra-carro", require("./routes/contratoCompraCarro.routes"));
-//rutas de busqueda 
-app.use("/", require("./routes/buscar.routes"))
 
-  const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () => {
-    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-  });
+// rutas de busqueda 
+app.use("/", require("./routes/buscar.routes"));
 
-      //console.log("🚀 Servidor corriendo en http://192.168.1.5:3001");
-;
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+});
