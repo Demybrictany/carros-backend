@@ -9,9 +9,7 @@ const app = express();
 // ✅ CORS CORREGIDO (acepta localhost, frontend desplegado y URL en .env)
 const allowedOrigins = [
   "https://carros-backend.onrender.com",
-  "http://localhost:3000",
-  "http://127.0.0.1:3000",
-];
+  "http://localhost:3000",];
 
 if (process.env.FRONTEND_URL) {
   allowedOrigins.push(process.env.FRONTEND_URL);

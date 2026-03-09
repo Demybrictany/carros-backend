@@ -1,20 +1,26 @@
 const Venta = require("../models/venta.model");
 const CarroPredio = require("../models/carropredio.model");
-const Comprador = require("../models/comprador.model");
 
 exports.obtenerVentas = async (req, res) => {
   try {
+    const include = [];
+
+    // Usa solo asociaciones realmente registradas para evitar fallos por alias.
+    if (Venta.associations?.Carro) {
+      include.push({ association: "Carro" });
+    }
+    if (Venta.associations?.Comprador) {
+      include.push({ association: "Comprador" });
+    }
+
     const ventas = await Venta.findAll({
-      include: [
-        { model: CarroPredio, as: "Carro" },
-        { model: Comprador, as: "Comprador" }
-      ]
+      include
     });
 
     res.json(ventas);
   } catch (error) {
-    console.error("Error al obtener ventas:", error);
-    res.status(500).json({ error: "Error al obtener ventas" });
+    console.error("Error en obtenerVentas:", error);
+    res.status(500).json({ error: "Error al obtener ventas", detalle: error.message });
   }
 };
 

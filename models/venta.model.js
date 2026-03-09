@@ -56,7 +56,7 @@ const Comprador = require("./comprador.model");
 
 Venta.belongsTo(CarroPredio, {
   foreignKey: "Id_Predio",
-  as: "Carro"
+  as: "CarroVenta"
 });
 
 Venta.belongsTo(Comprador, {

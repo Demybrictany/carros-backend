@@ -21,6 +21,14 @@ CarroPredio.belongsTo(Comprador, {
 });
 
 /* ==========================================
+   RELACIÓN: VENTA → COMPRADOR
+========================================== */
+Venta.belongsTo(Comprador, {
+  foreignKey: "Id_Compra",
+  as: "Comprador",
+});
+
+/* ==========================================
    RELACIÓN: CARRO → GASTOS
 ========================================== */
 CarroPredio.hasMany(Gasto, {
@@ -33,7 +41,15 @@ CarroPredio.hasMany(Gasto, {
 ========================================== */
 Gasto.belongsTo(CarroPredio, {
   foreignKey: "Id_Predio",
-  as: "Carro",
+  as: "CarroGasto",
+});
+
+/* ==========================================
+   RELACIÓN: VENTA → CARRO
+========================================== */
+Venta.belongsTo(CarroPredio, {
+  foreignKey: "Id_Predio",
+  as: "CarroVenta",
 });
 
 /* ==========================================
@@ -42,22 +58,6 @@ Gasto.belongsTo(CarroPredio, {
 CarroPredio.hasOne(Venta, {
   foreignKey: "Id_Predio",
   as: "Venta",
-});
-
-/* ==========================================
-   RELACIÓN: VENTA → CARRO
-========================================== */
-Venta.belongsTo(CarroPredio, {
-  foreignKey: "Id_Predio",
-  as: "Carro",
-});
-
-/* ==========================================
-   RELACIÓN: VENTA → COMPRADOR
-========================================== */
-Venta.belongsTo(Comprador, {
-  foreignKey: "Id_Compra",
-  as: "Comprador",
 });
 
 module.exports = { CarroPredio, Vendedor, Comprador, Gasto, Venta };

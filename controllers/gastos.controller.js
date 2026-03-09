@@ -8,7 +8,7 @@ exports.obtenerGastos = async (req, res) => {
       include: [
         {
           model: CarroPredio,
-          as: "Carro",
+          as: "CarroGasto",
         },
       ],
     });

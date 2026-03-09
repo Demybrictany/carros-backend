@@ -16,7 +16,7 @@ exports.generarContrato = async (req, res) => {
     // ============================
     const venta = await Venta.findByPk(ventaId, {
       include: [
-        { model: CarroPredio, as: "Carro" },
+        { model: CarroPredio, as: "CarroVenta" },
         { model: Comprador, as: "Comprador" }
       ]
     });
