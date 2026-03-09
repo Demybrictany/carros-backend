@@ -10,7 +10,7 @@ exports.obtenerVentas = async (req, res) => {
       include.push({ association: "CarroVenta" });
     }
     if (Venta.associations?.Comprador) {
-      include.push({ association: "Comprador" });
+      include.push({ association: "CompradorVenta" });
     }
 
     const ventas = await Venta.findAll({
