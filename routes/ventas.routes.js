@@ -1,18 +1,14 @@
-const express = require("express");
+﻿const express = require("express");
 const router = express.Router();
 
 const {
   obtenerVentas,
   crearVenta,
   actualizarVenta,
-  eliminarVenta
+  eliminarVenta,
 } = require("../controllers/ventas.controller");
 
-// 🔥 TODAS LAS RUTAS DEBEN TENER UNA FUNCIÓN, NO undefined
-
-router.get("/", obtenerVentas);
-router.post("/", crearVenta);
-router.put("/:id", actualizarVenta);
-router.delete("/:id", eliminarVenta);
+router.route("/").get(obtenerVentas).post(crearVenta);
+router.route("/:id").put(actualizarVenta).delete(eliminarVenta);
 
 module.exports = router;
