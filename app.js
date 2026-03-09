@@ -9,7 +9,7 @@ const sequelize = require("./db/db");
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: "https://carros-backend.onrender.com",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
