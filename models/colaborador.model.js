@@ -9,21 +9,24 @@ const Colaborador = db.define(
       primaryKey: true,
       autoIncrement: true
     },
+
     Nombre: {
       type: DataTypes.STRING(100),
       allowNull: false
     },
+
     Apellido: {
       type: DataTypes.STRING(100),
       allowNull: false
     },
+
     DPI: {
       type: DataTypes.STRING(13),
       allowNull: false
     }
   },
   {
-    tableName: "colaborador",
+    tableName: "colaborador", // 🔥 igual que tu base
     timestamps: false
   }
 );
