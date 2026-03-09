@@ -1,0 +1,610 @@
+/* =======================
+   🔥 TEMA GLOBAL DE LA APP
+   Estilo automotriz moderno
+======================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  background: linear-gradient(135deg, #0a0f14, #1b2a38, #0d141c);
+  color: #e5e5e5;
+  min-height: 100vh;
+}
+
+/* CONTENEDOR GLOBAL DE CADA PÁGINA */
+.page-container { 
+  padding: 30px; 
+  width: 100%; 
+  animation: fadeIn 0.8s ease-in-out; }
+/* TITULOS */
+.page-container h1 {
+  text-align: center;
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 25px;
+
+  background: linear-gradient(90deg, #3ab0ff, #00d4ff);
+  -webkit-text-fill-color: transparent;
+}
+
+/* FORMULARIOS GENERALES */
+.form-box {
+  border: 2px solid #1c3f5a;
+  padding: 20px;
+  width: 420px;
+  background: linear-gradient(135deg, #11212e, #1e3a54);
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+  transition: transform .2s;
+  margin: 0 auto;
+}
+
+.form-box:hover {
+  transform: translateY(-5px);
+}
+
+.form-box h3 {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.form-box input,
+.form-box select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 14px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+}
+
+.form-box input:focus,
+.form-box select:focus {
+  box-shadow: 0 0 12px #3ab0ff;
+}
+
+/* BOTONES PRINCIPALES */
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: #3ab0ff;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.menu-btn{
+  font-size:24px;
+  background:none;
+  border:none;
+  color:white;
+  margin-right:10px;
+  cursor:pointer;
+  display:none;
+}
+
+
+.button
+{
+    width: 100%;
+  padding: 12px;
+  background: #3ab0ff;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-primary:hover {
+  background: #0e8de1;
+  transform: scale(1.05);
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 12px;
+  background: #777;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-secondary:hover {
+  background: #555;
+  transform: scale(1.05);
+}
+
+/* TABLAS GENERALES */
+.table-modern {
+  width: 100%;
+  margin-left: 10px;
+  margin-right: auto;
+  border-collapse: collapse;
+  background: #f5f5f5;
+  color: #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table-modern thead {
+  background: #102b44;
+  color: white;
+  text-transform: uppercase;
+}
+
+.table-modern th,
+.table-modern td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+}
+
+.table-modern tbody tr:hover {
+  background: #d4e7f7;
+  transition: 0.2s ease-in-out;
+}
+
+/* BOTONES EN TABLA */
+.btn-edit {
+  background: #ffc107;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: bold;
+}
+
+.btn-edit:hover {
+  background: #ff9800;
+  transform: scale(1.1);
+}
+.btn-contrato {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.btn-contrato:hover {
+  background-color: #4f555a;
+}
+
+.btn-delete {
+  background: #ff4444;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: bold;
+  color: white;
+}
+.btn-eliminar-usuario {
+  background: #ffc107;
+  color: black;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-eliminar-usuario:hover {
+  background: #e0a800;
+}
+
+
+.btn-delete:hover {
+  background: #cc0000;
+  transform: scale(1.1);
+}
+
+/* ANIMACIÓN GLOBAL */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* HEADER SUPERIOR */
+.top-header {
+  background: #0a1320;
+  padding: 12px 25px;
+  border-bottom: 2px solid #3ab0ff;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  align-items: center;
+  justify-content: center; /* CENTRA EL TEXTO */
+  position: relative; /* Permite posicionar el logo sin romper el centro */
+  height: 70px;
+}
+
+/* Logo a la izquierda */
+.header-logo {
+  height: 300px;
+  position: absolute;   /* Permite fijarlo sin afectar el centro */
+  left: 150px;           /* SE MUEVE A LA IZQUIERDA */
+  filter: drop-shadow(1px 3px 5px rgba(0,0,0,0.6));
+}
+
+/* Texto 100% centrado */
+.header-title {
+  color: #3ab0ff;
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-align: center;
+  width: 100%;
+}
+
+/* ======================
+   CONTENIDO PRINCIPAL
+====================== */
+.content {
+  margin-left: 240px; /* deja espacio para el sidebar */
+  padding: 20px;
+  width: 100%;
+}
+.header-logo {
+  height: 50px;
+  margin-right: 15px;
+  vertical-align: middle;
+  filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.5));
+}
+
+/* PANTALLA DE INICIO CON LOGO CENTRADO */
+.inicio-container {
+  height: calc(100vh - 70px);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 250px;
+}
+
+
+.inicio-logo {
+  width: 1000px;        /* tamaño grande */
+    max-width: 800px;
+  filter: drop-shadow(0px 5px 20px rgba(0, 195, 255, 0.5));
+  animation: zoomIn 1s ease-in-out;
+}
+
+/* Animación suave */
+@keyframes zoomIn {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+
+/* El buscador se ajusta al ancho del form-box */
+.search-row {
+  width: 100%;
+  display: flex;
+  justify-content: left; /* derecha */
+  margin-bottom: 10px;       /* separación de inputs */
+}
+
+/* estilo del cuadro del buscador */
+.search-input-inside {
+  width: 70%;           /* cambia a 50%, 30%, 100% según lo quieras */
+  max-width: 800px;     /* límite */
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+/* estilo de datos del buscador */
+
+.result-card {
+  background: #0f1d2e;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border-left: 5px solid #4da3ff;
+  color: white;
+}
+
+.result-card h4 {
+  margin: 0 0 10px 0;
+  color: #4da3ff;
+}
+
+.result-card p {
+  margin: 2px 0;
+}
+
+.result-card img {
+  border: 2px solid #4da3ff;
+}
+
+/* Diseño para contratos la impresos*/
+.modal-contrato {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #1e2a38;
+  border: 2px solid #4da3ff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 300px;
+  color: white;
+  text-align: center;
+
+  /* 🔥 NUEVO */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-content button {
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* ========================= */
+/* CONFIGURACIÓN GLOBAL */
+/* ========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: Arial, sans-serif;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+
+/* ========================= */
+/* FORMULARIOS */
+/* ========================= */
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+button {
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ========================= */
+/* TABLAS */
+/* ========================= */
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* ========================= */
+/* TARJETAS / CAJAS */
+/* ========================= */
+
+.card,
+.form-box,
+.login-box {
+  width: 100%;
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* ======================
+   LAYOUT GENERAL
+====================== */
+
+.layout {
+  display: flex;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  margin-left: 220px; /* espacio del sidebar */
+  overflow-x: auto;
+}
+
+
+/* ======================
+   SIDEBAR IZQUIERDO
+====================== */
+
+.sidebar {
+  width: 220px;
+  background: #0e1a25;
+  height: 100vh;
+  padding: 20px;
+  border-right: 2px solid #3ab0ff;
+  box-shadow: 4px 0px 10px rgba(0,0,0,0.5);
+  position: fixed;
+  top: 60px; /* debajo del header */
+  left: 0;
+  transition: 0.3s;
+}
+
+.sidebar-title {
+  font-size: 22px;
+  color: #3ab0ff;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-menu li {
+  margin: 15px 0;
+}
+
+.sidebar-menu a {
+  text-decoration: none;
+  font-size: 18px;
+  color: #e5e5e5;
+  padding: 8px 12px;
+  display: block;
+  border-radius: 6px;
+  transition: 0.25s;
+}
+
+.sidebar-menu a:hover {
+  background: #3ab0ff;
+  color: #000;
+  transform: scale(1.05);
+}
+
+
+/* ======================
+   HEADER
+====================== */
+
+.top-header{
+  display: flex;
+  align-items: center;
+  background: #0d1b2a;
+  color: white;
+  padding: 10px 20px;
+  position: fixed;
+  width: 100%;
+  height: 60px;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-logo{
+  height: 40px;
+  margin-right: 10px;
+}
+
+.header-title{
+  flex: 1;
+  text-align: center;
+}
+
+.menu-btn{
+  display: none;
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+
+/* ======================
+   TELEFONOS
+====================== */
+
+@media (max-width: 768px) {
+
+  .menu-btn{
+    display: block;
+  }
+
+  .sidebar{
+    left: -230px;
+  }
+
+  .sidebar.open{
+    left: 0;
+  }
+
+  .content{
+    margin-left: 0;
+    padding: 15px;
+  }
+
+  .header-title{
+    font-size: 16px;
+  }
+
+}
+
+
+/* ======================
+   TABLETS
+====================== */
+
+@media (min-width: 769px) and (max-width: 1024px){
+
+  .sidebar{
+    width: 200px;
+  }
+
+  .content{
+    margin-left: 200px;
+  }
+
+}
+.menu-btn {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  font-size: 26px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: none;
+}
+
+/* Mostrar solo en móviles */
+@media (max-width: 768px) {
+  .menu-btn {
+    display: block;
+  }
+}

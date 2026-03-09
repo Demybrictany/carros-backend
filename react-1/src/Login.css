@@ -1,0 +1,93 @@
+.login-container {
+  width: 350px;
+  margin: 100px auto;
+  padding: 25px;
+  background: #0d1b2a;
+  border-radius: 10px;
+  color: white;
+  text-align: center;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: none;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 10px;
+  background: #1e90ff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+/* ===== MENU NORMAL (PC) ===== */
+.sidebar{
+  width: 220px;
+  min-height: 100vh;
+}
+
+/* ===== TELEFONOS ===== */
+@media (max-width:768px){
+
+  .sidebar{
+    position: fixed;
+    left: -220px; /* oculto */
+    top: 0;
+    height: 100%;
+    width: 220px;
+    z-index: 1000;
+    transition: 0.3s;
+  }
+
+  .sidebar.active{
+    left: 0; /* aparece */
+  }
+
+}
+
+/* ===== TELEFONOS ===== */
+@media (max-width: 480px) {
+
+  .login-container {
+    width: 90%;
+    margin: 60px auto;
+    padding: 20px;
+  }
+
+  .login-container input {
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .login-container button {
+    padding: 12px;
+    font-size: 16px;
+  }
+
+}
+
+/* ===== TABLETS ===== */
+@media (min-width: 481px) and (max-width: 1024px) {
+
+  .login-container {
+    width: 60%;
+    margin: 80px auto;
+    padding: 22px;
+  }
+
+  .login-container input {
+    padding: 11px;
+    font-size: 16px;
+  }
+
+  .login-container button {
+    padding: 11px;
+    font-size: 16px;
+  }
+
+}
