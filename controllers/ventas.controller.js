@@ -7,7 +7,7 @@ exports.obtenerVentas = async (req, res) => {
 
     // Usa solo asociaciones realmente registradas para evitar fallos por alias.
     if (Venta.associations?.Carro) {
-      include.push({ association: "Carro" });
+      include.push({ association: "CarroVenta" });
     }
     if (Venta.associations?.Comprador) {
       include.push({ association: "Comprador" });
