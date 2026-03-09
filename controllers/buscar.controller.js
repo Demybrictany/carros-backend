@@ -10,12 +10,11 @@ module.exports = async (req, res) => {
 
   if (!query) return res.json([]);
 
+  // Buscar por cualquier caracter
   const texto = `%${query}%`;
 
   try {
-
     switch (tipo) {
-
       case "carros":
         return res.json(
           await Carro.findAll({
@@ -79,71 +78,76 @@ module.exports = async (req, res) => {
           })
         );
 
-      // 🔎 BUSCAR EN TODO
-      case "todos":
-      default:
+      // 🔥 BUSCAR EN TODO
+case "todos":
+default:
+  const [carros, compradores, vendedores, ventas, gastos] =
+    await Promise.all([
+      Carro.findAll({
+        where: {
+          [Op.or]: [
+            { Placa: { [Op.like]: texto } },
+            { Modelo: { [Op.like]: texto } }
+          ]
+        }
+      }),
 
-        const [carros, compradores, vendedores, ventas, gastos] =
-          await Promise.all([
+      Comprador.findAll({
+        where: {
+          [Op.or]: [
+            { Nombre: { [Op.like]: texto } },
+            { Apellido: { [Op.like]: texto } },
+            { DPI: { [Op.like]: texto } }
+          ]
+        }
+      }),
 
-            Carro.findAll({
-              where: {
-                [Op.or]: [
-                  { Placa: { [Op.like]: texto } },
-                  { Modelo: { [Op.like]: texto } }
-                ]
-              }
-            }),
+      Vendedor.findAll({
+        where: {
+          [Op.or]: [
+            { Nombre: { [Op.like]: texto } },
+            { Dpi: { [Op.like]: texto } }
+          ]
+        }
+      }),
 
-            Comprador.findAll({
-              where: {
-                [Op.or]: [
-                  { Nombre: { [Op.like]: texto } },
-                  { Apellido: { [Op.like]: texto } },
-                  { DPI: { [Op.like]: texto } }
-                ]
-              }
-            }),
+      Venta.findAll({
+        where: {
+          [Op.or]: [
+            { Fecha: { [Op.like]: texto } },
+            { PrecioVenta: { [Op.like]: texto } }
+          ]
+        }
+      }),
 
-            Vendedor.findAll({
-              where: {
-                [Op.or]: [
-                  { Nombre: { [Op.like]: texto } },
-                  { Dpi: { [Op.like]: texto } }
-                ]
-              }
-            }),
+      Gasto.findAll({
+        where: {
+          [Op.or]: [
+            { Descripcion: { [Op.like]: texto } },
+            { Fecha: { [Op.like]: texto } }
+          ]
+        }
+      }),
+    ]);
 
-            Venta.findAll({
-              where: {
-                [Op.or]: [
-                  { Fecha: { [Op.like]: texto } },
-                  { PrecioVenta: { [Op.like]: texto } }
-                ]
-              }
-            }),
+  // 🔥 UNIFICAR TODO EN UN SOLO ARREGLO
+  return res.json([
+    ...carros,
+    ...compradores,
+    ...vendedores,
+    ...ventas,
+    ...gastos
+  ]);
 
-            Gasto.findAll({
-              where: {
-                [Op.or]: [
-                  { Descripcion: { [Op.like]: texto } },
-                  { Fecha: { [Op.like]: texto } }
-                ]
-              }
-            })
 
-          ]);
-
-        // 🔥 UNIR TODO
-        return res.json([
-          ...carros.map(x => x.toJSON()),
-          ...compradores.map(x => x.toJSON()),
-          ...vendedores.map(x => x.toJSON()),
-          ...ventas.map(x => x.toJSON()),
-          ...gastos.map(x => x.toJSON())
-        ]);
+        return res.json({
+          carros,
+          compradores,
+          vendedores,
+          ventas,
+          gastos
+        });
     }
-
   } catch (err) {
     console.error(err);
     res.status(500).json([]);
