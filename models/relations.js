@@ -4,58 +4,62 @@ const Comprador = require("./comprador.model");
 const Gasto = require("./gastos.model");
 const Venta = require("./venta.model");
 
-/* ==========================================
-   RELACION: CARRO -> VENDEDOR
-========================================== */
-CarroPredio.belongsTo(Vendedor, {
+const ensureBelongsTo = (source, target, options) => {
+  if (!source.associations?.[options.as]) {
+    source.belongsTo(target, options);
+  }
+};
+
+const ensureHasMany = (source, target, options) => {
+  if (!source.associations?.[options.as]) {
+    source.hasMany(target, options);
+  }
+};
+
+const ensureHasOne = (source, target, options) => {
+  if (!source.associations?.[options.as]) {
+    source.hasOne(target, options);
+  }
+};
+
+/* CARRO -> VENDEDOR */
+ensureBelongsTo(CarroPredio, Vendedor, {
   foreignKey: "Id_Vendedor",
   as: "Vendedor",
 });
 
-/* ==========================================
-   RELACION: CARRO -> COMPRADOR
-========================================== */
-CarroPredio.belongsTo(Comprador, {
+/* CARRO -> COMPRADOR */
+ensureBelongsTo(CarroPredio, Comprador, {
   foreignKey: "Id_Compra",
   as: "Comprador",
 });
 
-/* ==========================================
-   RELACION: CARRO -> GASTOS
-========================================== */
-CarroPredio.hasMany(Gasto, {
+/* CARRO -> GASTOS */
+ensureHasMany(CarroPredio, Gasto, {
   foreignKey: "Id_Predio",
   as: "Gastos",
 });
 
-/* ==========================================
-   RELACION: GASTO -> CARRO
-========================================== */
-Gasto.belongsTo(CarroPredio, {
+/* GASTO -> CARRO */
+ensureBelongsTo(Gasto, CarroPredio, {
   foreignKey: "Id_Predio",
   as: "Carro",
 });
 
-/* ==========================================
-   RELACION: CARRO -> VENTA (1 a 1)
-========================================== */
-CarroPredio.hasOne(Venta, {
+/* CARRO -> VENTA (1 a 1) */
+ensureHasOne(CarroPredio, Venta, {
   foreignKey: "Id_Predio",
   as: "Venta",
 });
 
-/* ==========================================
-   RELACION: VENTA -> CARRO
-========================================== */
-Venta.belongsTo(CarroPredio, {
+/* VENTA -> CARRO */
+ensureBelongsTo(Venta, CarroPredio, {
   foreignKey: "Id_Predio",
   as: "Carro",
 });
 
-/* ==========================================
-   RELACION: VENTA -> COMPRADOR
-========================================== */
-Venta.belongsTo(Comprador, {
+/* VENTA -> COMPRADOR */
+ensureBelongsTo(Venta, Comprador, {
   foreignKey: "Id_Compra",
   as: "Comprador",
 });

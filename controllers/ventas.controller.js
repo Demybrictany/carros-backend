@@ -86,10 +86,17 @@ const validatePayload = (data, { partial = false } = {}) => {
   return null;
 };
 
+const buildVentasInclude = () => {
+  const include = [];
+  if (Venta.associations?.Carro) include.push({ association: "Carro" });
+  if (Venta.associations?.Comprador) include.push({ association: "Comprador" });
+  return include;
+};
+
 exports.obtenerVentas = async (req, res) => {
   try {
     const ventas = await Venta.findAll({
-      include: [{ association: "Carro" }, { association: "Comprador" }],
+      include: buildVentasInclude(),
       order: [["Id_Venta", "DESC"]],
     });
 
@@ -112,7 +119,10 @@ exports.crearVenta = async (req, res) => {
       return res.status(400).json({ error: validationError });
     }
 
-    const carro = await CarroPredio.findByPk(data.Id_Predio, { transaction: tx, lock: tx.LOCK.UPDATE });
+    const carro = await CarroPredio.findByPk(data.Id_Predio, {
+      transaction: tx,
+      lock: tx.LOCK.UPDATE,
+    });
     if (!carro) {
       await tx.rollback();
       return res.status(404).json({ error: "Carro no existe" });
@@ -139,6 +149,14 @@ exports.crearVenta = async (req, res) => {
   } catch (error) {
     await tx.rollback();
     console.error("Error al crear venta:", error);
+
+    if (error?.name === "SequelizeForeignKeyConstraintError") {
+      return res.status(400).json({
+        error: "No se puede guardar la venta por llaves foraneas",
+        detalle: error.parent?.sqlMessage || error.message,
+      });
+    }
+
     res.status(500).json({
       error: "Error al crear venta",
       detalle: error.message,
@@ -177,7 +195,10 @@ exports.actualizarVenta = async (req, res) => {
     const prevPredio = venta.Id_Predio;
     const nuevoPredio = payload.Id_Predio;
 
-    const carroDestino = await CarroPredio.findByPk(nuevoPredio, { transaction: tx, lock: tx.LOCK.UPDATE });
+    const carroDestino = await CarroPredio.findByPk(nuevoPredio, {
+      transaction: tx,
+      lock: tx.LOCK.UPDATE,
+    });
     if (!carroDestino) {
       await tx.rollback();
       return res.status(404).json({ error: "Carro destino no existe" });
@@ -197,7 +218,10 @@ exports.actualizarVenta = async (req, res) => {
     await Venta.update(payload, { where: { Id_Venta: id }, transaction: tx });
 
     if (nuevoPredio !== prevPredio) {
-      const carroAnterior = await CarroPredio.findByPk(prevPredio, { transaction: tx, lock: tx.LOCK.UPDATE });
+      const carroAnterior = await CarroPredio.findByPk(prevPredio, {
+        transaction: tx,
+        lock: tx.LOCK.UPDATE,
+      });
       if (carroAnterior) {
         carroAnterior.Id_Compra = null;
         await carroAnterior.save({ transaction: tx });
@@ -231,7 +255,10 @@ exports.eliminarVenta = async (req, res) => {
       return res.status(404).json({ error: "Venta no encontrada" });
     }
 
-    const carro = await CarroPredio.findByPk(venta.Id_Predio, { transaction: tx, lock: tx.LOCK.UPDATE });
+    const carro = await CarroPredio.findByPk(venta.Id_Predio, {
+      transaction: tx,
+      lock: tx.LOCK.UPDATE,
+    });
     if (carro) {
       carro.Id_Compra = null;
       await carro.save({ transaction: tx });

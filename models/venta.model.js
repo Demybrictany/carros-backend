@@ -2,7 +2,7 @@
 const db = require("../db/db");
 
 const Venta = db.define(
-  "venta",
+  "Venta",
   {
     Id_Venta: {
       type: DataTypes.INTEGER,
@@ -51,4 +51,3 @@ const Venta = db.define(
 );
 
 module.exports = Venta;
-
