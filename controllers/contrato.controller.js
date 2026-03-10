@@ -20,27 +20,29 @@ const buildVentaInclude = () => {
   return include;
 };
 
-// Fixes common UTF-8/Latin1 mojibake sequences if data comes corrupted from DB.
-const fixMojibake = (value) => {
-  if (typeof value !== "string") return value;
+// Corrige caracteres raros
+const fixMojibake = (text) => {
+  if (!text || typeof text !== "string") return text;
 
-  return value
-    .replace(/Ã¡/g, "\u00E1")
-    .replace(/Ã©/g, "\u00E9")
-    .replace(/Ã­/g, "\u00ED")
-    .replace(/Ã³/g, "\u00F3")
-    .replace(/Ãº/g, "\u00FA")
-    .replace(/Ã\u00B1/g, "\u00F1")
-    .replace(/Ã/g, "\u00C1")
-    .replace(/Ã‰/g, "\u00C9")
-    .replace(/Ã/g, "\u00CD")
-    .replace(/Ã“/g, "\u00D3")
-    .replace(/Ãš/g, "\u00DA")
-    .replace(/Ã‘/g, "\u00D1")
+  return text
+    .replace(/Ã¡/g, "á")
+    .replace(/Ã©/g, "é")
+    .replace(/Ã­/g, "í")
+    .replace(/Ã³/g, "ó")
+    .replace(/Ãº/g, "ú")
+    .replace(/Ã±/g, "ñ")
+    .replace(/Ã/g, "Á")
+    .replace(/Ã‰/g, "É")
+    .replace(/Ã/g, "Í")
+    .replace(/Ã“/g, "Ó")
+    .replace(/Ãš/g, "Ú")
+    .replace(/Ã‘/g, "Ñ")
     .replace(/â€“/g, "-")
     .replace(/â€”/g, "-")
-    .replace(/â€œ|â€/g, '"')
-    .replace(/â€˜|â€™/g, "'");
+    .replace(/â€œ/g, '"')
+    .replace(/â€/g, '"')
+    .replace(/â€˜/g, "'")
+    .replace(/â€™/g, "'");
 };
 
 exports.generarContrato = async (req, res) => {
@@ -61,14 +63,12 @@ exports.generarContrato = async (req, res) => {
     if (!carro) {
       return res.status(400).json({
         error: "La venta no tiene carro asociado",
-        detalle: "Revise relaciones/tabla de CarroPredio y llaves foraneas de ventas",
       });
     }
 
     if (!comprador) {
       return res.status(400).json({
         error: "La venta no tiene comprador asociado",
-        detalle: "Revise relaciones/tabla de Comprador y llaves foraneas de ventas",
       });
     }
 
@@ -92,7 +92,10 @@ exports.generarContrato = async (req, res) => {
     const doc = new PDFDocument({ margin: 60 });
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename=contrato_${ventaId}.pdf`);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=contrato_${ventaId}.pdf`
+    );
 
     doc.pipe(res);
 
@@ -115,47 +118,46 @@ exports.generarContrato = async (req, res) => {
 
     doc.moveDown(2);
 
-    const gerenteNombre = "Derick Isaac de Le\u00F3n R\u00EDos";
+    const gerenteNombre = "Derick Isaac de León Ríos";
     const gerenteDpi = "3147-84071-0901";
 
-    const modelo = fixMojibake(carro.Modelo || "");
-    const placa = fixMojibake(carro.Placa || "");
-    const chasis = fixMojibake(carro.Num_Chasis || "");
-    const motor = fixMojibake(carro.Num_Motor || "");
-    const color = fixMojibake(carro.Color || "");
-    const nombreComprador = fixMojibake(comprador.Nombre || "");
-    const apellidoComprador = fixMojibake(comprador.Apellido || "");
+    const modelo = fixMojibake(carro.Modelo ?? "");
+    const placa = fixMojibake(carro.Placa ?? "");
+    const chasis = fixMojibake(carro.Num_Chasis ?? "");
+    const motor = fixMojibake(carro.Num_Motor ?? "");
+    const color = fixMojibake(carro.Color ?? "");
+
+    const nombreComprador = fixMojibake(comprador.Nombre ?? "");
+    const apellidoComprador = fixMojibake(comprador.Apellido ?? "");
+    const dpiComprador = fixMojibake(comprador.DPI ?? "");
 
     doc
       .font("Times-Roman")
       .fontSize(12)
       .text(
-        `Por medio de la presente Yo ${gerenteNombre}, con n\u00FAmero de DPI ${gerenteDpi}, ` +
-          `hago entrega del veh\u00EDculo:\n\n` +
+        `Por medio de la presente Yo ${gerenteNombre}, con número de DPI ${gerenteDpi}, hago entrega del vehículo:\n\n` +
           `Marca/Modelo: ${modelo}\n` +
-          `A\u00F1o: ${carro.Anio}\n` +
+          `Año: ${carro.Anio}\n` +
           `Placas: ${placa}\n` +
           `Chasis: ${chasis}\n` +
-          `N\u00FAmero de motor: ${motor}\n` +
+          `Número de motor: ${motor}\n` +
           `Color: ${color}\n\n` +
-          `El cual se encuentra a nombre de ${nombreComprador} ${apellidoComprador}, ` +
-          `quien se identifica con n\u00FAmero de DPI ${comprador.DPI}. Se entrega el veh\u00EDculo con todos sus accesorios, ` +
-          `incluyendo tarjeta de circulaci\u00F3n, t\u00EDtulo, llave y DPI.\n\n`,
+          `El cual se encuentra a nombre de ${nombreComprador} ${apellidoComprador}, quien se identifica con número de DPI ${dpiComprador}. ` +
+          `Se entrega el vehículo con todos sus accesorios, incluyendo tarjeta de circulación, título, llave y DPI.\n\n`,
         { align: "justify" }
       );
 
     doc.text(
-      `Yo ${nombreComprador} ${apellidoComprador}, con n\u00FAmero de DPI ${comprador.DPI}, ` +
-        `acepto el veh\u00EDculo en el estado en que se encuentra. Sin hacer responsable a Puchys Imports ` +
-        `ni a su gerente ${gerenteNombre}, quien se identifica con DPI ${gerenteDpi}, por fallas en motor, caja, ` +
-        `suspensi\u00F3n o cualquier otra aver\u00EDa tras revisi\u00F3n mec\u00E1nica.\n\n`,
+      `Yo ${nombreComprador} ${apellidoComprador}, con número de DPI ${dpiComprador}, acepto el vehículo en el estado en que se encuentra. ` +
+        `Sin hacer responsable a Puchys Imports ni a su gerente ${gerenteNombre}, quien se identifica con DPI ${gerenteDpi}, ` +
+        `por fallas en motor, caja, suspensión o cualquier otra avería tras revisión mecánica.\n\n`,
       { align: "justify" }
     );
 
     doc.text(
-      `La presente deslinda al gerente de Puchys Imports, ${gerenteNombre}, de cualquier responsabilidad civil, ` +
-        `penal o de tr\u00E1nsito, as\u00ED como cualquier alteraci\u00F3n en el veh\u00EDculo a partir de la fecha de entrega. ` +
-        `Se otorga un plazo de ${diasFinales} d\u00EDas para realizar el respectivo traspaso.\n\n`,
+      `La presente deslinda al gerente de Puchys Imports, ${gerenteNombre}, de cualquier responsabilidad civil, penal o de tránsito, ` +
+        `así como cualquier alteración en el vehículo a partir de la fecha de entrega. Se otorga un plazo de ${diasFinales} días ` +
+        `para realizar el respectivo traspaso.\n\n`,
       { align: "justify" }
     );
 
@@ -174,6 +176,7 @@ exports.generarContrato = async (req, res) => {
     doc.end();
   } catch (error) {
     console.error("ERROR CONTRATO:", error);
+
     res.status(500).json({
       error: "Error generando contrato",
       detalle: error.message,
