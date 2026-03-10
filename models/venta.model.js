@@ -45,9 +45,10 @@ const Venta = db.define(
     },
   },
   {
-    tableName: "venta",
+    tableName: "ventas",
     timestamps: false,
   }
 );
 
 module.exports = Venta;
+
