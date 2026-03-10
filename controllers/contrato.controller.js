@@ -1,4 +1,4 @@
-const PDFDocument = require("pdfkit");
+﻿const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
 
@@ -12,11 +12,11 @@ exports.generarContrato = async (req, res) => {
     const { ventaId } = req.params;
 
     // ============================
-    // 🔍 BUSCAR DATOS DE LA VENTA
+    // ðŸ” BUSCAR DATOS DE LA VENTA
     // ============================
     const venta = await Venta.findByPk(ventaId, {
       include: [
-        { model: CarroPredio, as: "CarroVenta" },
+        { model: CarroPredio, as: "Carro" },
         { model: Comprador, as: "Comprador" }
       ]
     });
@@ -29,7 +29,7 @@ exports.generarContrato = async (req, res) => {
     const comprador = venta.Comprador;
 
     // ============================
-    // CALCULAR DÍAS RESTANTES
+    // CALCULAR DÃAS RESTANTES
     // ============================
     const hoyFecha = new Date();
     const fechaIngreso = new Date(carro.Fecha_Ingreso);
@@ -51,7 +51,7 @@ exports.generarContrato = async (req, res) => {
     }
 
     // ============================
-    // 📅 FECHA DEL CONTRATO
+    // ðŸ“… FECHA DEL CONTRATO
     // ============================
     const hoy = new Date();
     const dia = hoy.getDate();
@@ -59,7 +59,7 @@ exports.generarContrato = async (req, res) => {
     const anio = hoy.getFullYear();
 
     // ============================
-    // 📄 CREACIÓN DE PDF (SIN GUARDAR EN DISCO)
+    // ðŸ“„ CREACIÃ“N DE PDF (SIN GUARDAR EN DISCO)
     // ============================
     const doc = new PDFDocument({ margin: 60 });
 
@@ -72,7 +72,7 @@ exports.generarContrato = async (req, res) => {
     doc.pipe(res);
 
     // ============================
-    // 🖼 LOGO (ARRIBA DERECHA)
+    // ðŸ–¼ LOGO (ARRIBA DERECHA)
     // ============================
     const logoPath = path.join(__dirname, "..", "imagenes", "Logo.png");
 
@@ -81,7 +81,7 @@ exports.generarContrato = async (req, res) => {
     }
 
     // ============================
-    // TÍTULO
+    // TÃTULO
     // ============================
     doc.font("Times-Bold")
       .fontSize(16)
@@ -93,7 +93,7 @@ exports.generarContrato = async (req, res) => {
     doc.moveDown(4);
 
     // ============================
-    // 📌 FECHA
+    // ðŸ“Œ FECHA
     // ============================
     doc.font("Times-Roman")
       .fontSize(12)
@@ -105,43 +105,43 @@ exports.generarContrato = async (req, res) => {
     doc.moveDown(2);
 
     // ============================
-    // 🔐 DATOS FIJOS DEL GERENTE
+    // ðŸ” DATOS FIJOS DEL GERENTE
     // ============================
-    const gerenteNombre = "Derick Isaac de León Ríos";
+    const gerenteNombre = "Derick Isaac de LeÃ³n RÃ­os";
     const gerenteDpi = "3147-84071-0901";
 
     // ============================
-    // 📌 TEXTO DEL CONTRATO
+    // ðŸ“Œ TEXTO DEL CONTRATO
     // ============================
     doc.font("Times-Roman")
       .fontSize(12)
       .text(
-        `Por medio de la presente Yo ${gerenteNombre}, con número de DPI ${gerenteDpi}, ` +
-        `hago entrega del vehículo:\n\n` +
+        `Por medio de la presente Yo ${gerenteNombre}, con nÃºmero de DPI ${gerenteDpi}, ` +
+        `hago entrega del vehÃ­culo:\n\n` +
         `Marca/Modelo: ${carro.Modelo}\n` +
-        `Año: ${carro.Anio}\n` +
+        `AÃ±o: ${carro.Anio}\n` +
         `Placas: ${carro.Placa}\n` +
         `Chasis: ${carro.Num_Chasis}\n` +
-        `Número de motor: ${carro.Num_Motor}\n` +
+        `NÃºmero de motor: ${carro.Num_Motor}\n` +
         `Color: ${carro.Color}\n\n` +
         `El cual se encuentra a nombre de ${comprador.Nombre} ${comprador.Apellido}, ` +
-        `quien se identifica con número de DPI ${comprador.DPI}. Se entrega el vehículo con todos sus accesorios, ` +
-        `incluyendo tarjeta de circulación, título, llave y DPI.\n\n`,
+        `quien se identifica con nÃºmero de DPI ${comprador.DPI}. Se entrega el vehÃ­culo con todos sus accesorios, ` +
+        `incluyendo tarjeta de circulaciÃ³n, tÃ­tulo, llave y DPI.\n\n`,
         { align: "justify" }
       );
 
     doc.text(
-      `Yo ${comprador.Nombre} ${comprador.Apellido}, con número de DPI ${comprador.DPI}, ` +
-      `acepto el vehículo en el estado en que se encuentra. Sin hacer responsable a Puchys Imports ` +
+      `Yo ${comprador.Nombre} ${comprador.Apellido}, con nÃºmero de DPI ${comprador.DPI}, ` +
+      `acepto el vehÃ­culo en el estado en que se encuentra. Sin hacer responsable a Puchys Imports ` +
       `ni a su gerente ${gerenteNombre}, quien se identifica con DPI ${gerenteDpi}, por fallas en motor, caja, ` +
-      `suspensión o cualquier otra avería tras revisión mecánica.\n\n`,
+      `suspensiÃ³n o cualquier otra averÃ­a tras revisiÃ³n mecÃ¡nica.\n\n`,
       { align: "justify" }
     );
 
     doc.text(
       `La presente deslinda al gerente de Puchys Imports, ${gerenteNombre}, de cualquier responsabilidad civil, ` +
-      `penal o de tránsito, así como cualquier alteración en el vehículo a partir de la fecha de entrega. ` +
-      `Se otorga un plazo de ${diasFinales} días para realizar el respectivo traspaso.\n\n`,
+      `penal o de trÃ¡nsito, asÃ­ como cualquier alteraciÃ³n en el vehÃ­culo a partir de la fecha de entrega. ` +
+      `Se otorga un plazo de ${diasFinales} dÃ­as para realizar el respectivo traspaso.\n\n`,
       { align: "justify" }
     );
 
@@ -150,7 +150,7 @@ exports.generarContrato = async (req, res) => {
     );
 
     // ============================
-    // ✍ FIRMAS AL MISMO NIVEL
+    // âœ FIRMAS AL MISMO NIVEL
     // ============================
     doc.moveDown(4);
 
