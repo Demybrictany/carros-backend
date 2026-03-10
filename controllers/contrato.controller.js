@@ -20,6 +20,29 @@ const buildVentaInclude = () => {
   return include;
 };
 
+// Fixes common UTF-8/Latin1 mojibake sequences if data comes corrupted from DB.
+const fixMojibake = (value) => {
+  if (typeof value !== "string") return value;
+
+  return value
+    .replace(/Ã¡/g, "\u00E1")
+    .replace(/Ã©/g, "\u00E9")
+    .replace(/Ã­/g, "\u00ED")
+    .replace(/Ã³/g, "\u00F3")
+    .replace(/Ãº/g, "\u00FA")
+    .replace(/Ã\u00B1/g, "\u00F1")
+    .replace(/Ã/g, "\u00C1")
+    .replace(/Ã‰/g, "\u00C9")
+    .replace(/Ã/g, "\u00CD")
+    .replace(/Ã“/g, "\u00D3")
+    .replace(/Ãš/g, "\u00DA")
+    .replace(/Ã‘/g, "\u00D1")
+    .replace(/â€“/g, "-")
+    .replace(/â€”/g, "-")
+    .replace(/â€œ|â€/g, '"')
+    .replace(/â€˜|â€™/g, "'");
+};
+
 exports.generarContrato = async (req, res) => {
   try {
     const { ventaId } = req.params;
@@ -78,13 +101,10 @@ exports.generarContrato = async (req, res) => {
       doc.image(logoPath, 420, 30, { width: 120 });
     }
 
-    doc
-      .font("Times-Bold")
-      .fontSize(16)
-      .text("", 60, 90, {
-        width: 350,
-        align: "center",
-      });
+    doc.font("Times-Bold").fontSize(16).text("", 60, 90, {
+      width: 350,
+      align: "center",
+    });
 
     doc.moveDown(4);
 
@@ -95,39 +115,47 @@ exports.generarContrato = async (req, res) => {
 
     doc.moveDown(2);
 
-    const gerenteNombre = "Derick Isaac de León Ríos";
+    const gerenteNombre = "Derick Isaac de Le\u00F3n R\u00EDos";
     const gerenteDpi = "3147-84071-0901";
+
+    const modelo = fixMojibake(carro.Modelo || "");
+    const placa = fixMojibake(carro.Placa || "");
+    const chasis = fixMojibake(carro.Num_Chasis || "");
+    const motor = fixMojibake(carro.Num_Motor || "");
+    const color = fixMojibake(carro.Color || "");
+    const nombreComprador = fixMojibake(comprador.Nombre || "");
+    const apellidoComprador = fixMojibake(comprador.Apellido || "");
 
     doc
       .font("Times-Roman")
       .fontSize(12)
       .text(
-        `Por medio de la presente Yo ${gerenteNombre}, con número de DPI ${gerenteDpi}, ` +
-          `hago entrega del vehículo:\n\n` +
-          `Marca/Modelo: ${carro.Modelo}\n` +
-          `Año: ${carro.Anio}\n` +
-          `Placas: ${carro.Placa}\n` +
-          `Chasis: ${carro.Num_Chasis}\n` +
-          `Número de motor: ${carro.Num_Motor}\n` +
-          `Color: ${carro.Color}\n\n` +
-          `El cual se encuentra a nombre de ${comprador.Nombre} ${comprador.Apellido}, ` +
-          `quien se identifica con número de DPI ${comprador.DPI}. Se entrega el vehículo con todos sus accesorios, ` +
-          `incluyendo tarjeta de circulación, título, llave y DPI.\n\n`,
+        `Por medio de la presente Yo ${gerenteNombre}, con n\u00FAmero de DPI ${gerenteDpi}, ` +
+          `hago entrega del veh\u00EDculo:\n\n` +
+          `Marca/Modelo: ${modelo}\n` +
+          `A\u00F1o: ${carro.Anio}\n` +
+          `Placas: ${placa}\n` +
+          `Chasis: ${chasis}\n` +
+          `N\u00FAmero de motor: ${motor}\n` +
+          `Color: ${color}\n\n` +
+          `El cual se encuentra a nombre de ${nombreComprador} ${apellidoComprador}, ` +
+          `quien se identifica con n\u00FAmero de DPI ${comprador.DPI}. Se entrega el veh\u00EDculo con todos sus accesorios, ` +
+          `incluyendo tarjeta de circulaci\u00F3n, t\u00EDtulo, llave y DPI.\n\n`,
         { align: "justify" }
       );
 
     doc.text(
-      `Yo ${comprador.Nombre} ${comprador.Apellido}, con número de DPI ${comprador.DPI}, ` +
-        `acepto el vehículo en el estado en que se encuentra. Sin hacer responsable a Puchys Imports ` +
+      `Yo ${nombreComprador} ${apellidoComprador}, con n\u00FAmero de DPI ${comprador.DPI}, ` +
+        `acepto el veh\u00EDculo en el estado en que se encuentra. Sin hacer responsable a Puchys Imports ` +
         `ni a su gerente ${gerenteNombre}, quien se identifica con DPI ${gerenteDpi}, por fallas en motor, caja, ` +
-        `suspensión o cualquier otra avería tras revisión mecánica.\n\n`,
+        `suspensi\u00F3n o cualquier otra aver\u00EDa tras revisi\u00F3n mec\u00E1nica.\n\n`,
       { align: "justify" }
     );
 
     doc.text(
       `La presente deslinda al gerente de Puchys Imports, ${gerenteNombre}, de cualquier responsabilidad civil, ` +
-        `penal o de tránsito, así como cualquier alteración en el vehículo a partir de la fecha de entrega. ` +
-        `Se otorga un plazo de ${diasFinales} días para realizar el respectivo traspaso.\n\n`,
+        `penal o de tr\u00E1nsito, as\u00ED como cualquier alteraci\u00F3n en el veh\u00EDculo a partir de la fecha de entrega. ` +
+        `Se otorga un plazo de ${diasFinales} d\u00EDas para realizar el respectivo traspaso.\n\n`,
       { align: "justify" }
     );
 
