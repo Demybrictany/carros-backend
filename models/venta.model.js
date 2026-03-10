@@ -2,7 +2,7 @@
 const db = require("../db/db");
 
 const Venta = db.define(
-  "venta",
+  "ventas",
   {
     Id_Venta: {
       type: DataTypes.INTEGER,
