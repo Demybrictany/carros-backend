@@ -87,9 +87,10 @@ exports.generarContrato = async (req, res) => {
 
     if (!vendedor) {
       return res.status(400).json({
-        error: "La venta no tiene vendedor asociado",
+        error: "La venta no tiene vendedor asociado (vendedor del carro no está cargado)",
       });
     }
+
 
     const hoyFecha = new Date();
     const fechaIngreso = carro.Fecha_Ingreso ? new Date(carro.Fecha_Ingreso) : null;
@@ -152,7 +153,7 @@ exports.generarContrato = async (req, res) => {
 
     const nombreVendedor = fixMojibake(vendedor.Nombre ?? "");
     const apellidoVendedor = fixMojibake(vendedor.Apellido ?? "");
-    const dpiVendedor = fixMojibake(vendedor.Dpi ?? "");
+    const dpiVendedor = fixMojibake(vendedor.Dpi ?? vendedor.DPI ?? "No registrado");
 
     doc
       .font("Times-Roman")
