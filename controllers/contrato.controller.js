@@ -152,7 +152,7 @@ exports.generarContrato = async (req, res) => {
 
     const nombreVendedor = fixMojibake(vendedor.Nombre ?? "");
     const apellidoVendedor = fixMojibake(vendedor.Apellido ?? "");
-    const dpiVendedor = fixMojibake(vendedor.DPI ?? "");
+    const dpiVendedor = fixMojibake(vendedor.Dpi ?? "");
 
     doc
       .font("Times-Roman")
