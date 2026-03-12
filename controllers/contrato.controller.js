@@ -131,6 +131,10 @@ exports.generarContrato = async (req, res) => {
     const apellidoComprador = fixMojibake(comprador.Apellido ?? "");
     const dpiComprador = fixMojibake(comprador.DPI ?? "");
 
+    const nombreVendedor = fixMojibake(vendedor.Nombre ?? "");
+    const apellidoVendedor = fixMojibake(vendedor.Apellido ?? "");
+    const dpiVendedor = fixMojibake(vendedor.DPI ?? "");
+
     doc
       .font("Times-Roman")
       .fontSize(12)
@@ -142,7 +146,7 @@ exports.generarContrato = async (req, res) => {
           `Chasis: ${chasis}\n` +
           `Número de motor: ${motor}\n` +
           `Color: ${color}\n\n` +
-          `El cual se encuentra a nombre de ${nombreComprador} ${apellidoComprador}, quien se identifica con número de DPI ${dpiComprador}. ` +
+          `El cual se encuentra a nombre de ${nombreVendedor} ${apellidoVendedor}, quien se identifica con número de DPI ${dpiVendedor}. ` +
           `Se entrega el vehículo con todos sus accesorios, incluyendo tarjeta de circulación, título, llave y DPI.\n\n`,
         { align: "justify" }
       );
