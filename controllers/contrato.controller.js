@@ -149,6 +149,7 @@ exports.generarContrato = async (req, res) => {
           `El cual se encuentra a nombre de ${nombreVendedor} ${apellidoVendedor}, quien se identifica con número de DPI ${dpiVendedor}. ` +
           `Se entrega el vehículo con todos sus accesorios, incluyendo tarjeta de circulación, título, llave y DPI.\n\n`,
         { align: "justify" }
+        
       );
 
     doc.text(
