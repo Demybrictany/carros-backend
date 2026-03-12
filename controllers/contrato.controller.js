@@ -7,10 +7,22 @@ const Venta = require("../models/venta.model");
 const buildVentaInclude = () => {
   const include = [];
 
+  const addCarroInclude = (associationName) => {
+    const includeItem = { association: associationName };
+
+    // Si el modelo tiene una asociación con Vendedor, la incluimos para poder usarla en el contrato
+    const assoc = Venta.associations?.[associationName];
+    if (assoc?.target?.associations?.Vendedor) {
+      includeItem.include = [{ association: "Vendedor" }];
+    }
+
+    return includeItem;
+  };
+
   if (Venta.associations?.Carro) {
-    include.push({ association: "Carro" });
+    include.push(addCarroInclude("Carro"));
   } else if (Venta.associations?.CarroVenta) {
-    include.push({ association: "CarroVenta" });
+    include.push(addCarroInclude("CarroVenta"));
   }
 
   if (Venta.associations?.Comprador) {
@@ -59,6 +71,7 @@ exports.generarContrato = async (req, res) => {
 
     const carro = venta.Carro || venta.CarroVenta || null;
     const comprador = venta.Comprador || null;
+    const vendedor = carro?.Vendedor || null;
 
     if (!carro) {
       return res.status(400).json({
@@ -69,6 +82,12 @@ exports.generarContrato = async (req, res) => {
     if (!comprador) {
       return res.status(400).json({
         error: "La venta no tiene comprador asociado",
+      });
+    }
+
+    if (!vendedor) {
+      return res.status(400).json({
+        error: "La venta no tiene vendedor asociado",
       });
     }
 
