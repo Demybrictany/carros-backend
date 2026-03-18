@@ -1,5 +1,7 @@
 const { DataTypes } = require("sequelize");
 const db = require("../db/db");
+const Colaborador = require("./colaborador.model");
+const Venta = require("./venta.model");
 
 const VentaColaborador = db.define("VentaColaborador", {
 
@@ -10,16 +12,17 @@ const VentaColaborador = db.define("VentaColaborador", {
   Rol: { type: DataTypes.STRING(30), allowNull: false }
 
 },{
-  tableName: "VentaColaborador",
+  tableName: "venta_colaborador",
   timestamps: false
 });
+
 VentaColaborador.belongsTo(Colaborador, {
   foreignKey: "Id_Colaborador",
   as: "Colaborador"
 });
-Venta.hasMany(VentaColaborador, {
+VentaColaborador.belongsTo(Venta, {
   foreignKey: "Id_Venta",
-  as: "Colaboradores"
+  as: "Venta"
 });
 
 module.exports = VentaColaborador;
