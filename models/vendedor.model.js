@@ -43,7 +43,7 @@ const Vendedor = db.define(
 
   },
   {
-    tableName: "Vendedor",
+    tableName: "vendedor",
     timestamps: false,
   }
 );

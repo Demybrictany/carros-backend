@@ -35,7 +35,7 @@ const CarroPredio = db.define("CarroPredio", {
   Id_Compra: { type: DataTypes.INTEGER, allowNull: true }
 
 }, {
-  tableName: "CarroPredio",
+  tableName: "carropredio",
   timestamps: false,
 });
 

@@ -9,7 +9,7 @@ const Comprador = db.define("Comprador", {
   Telefono: { type: DataTypes.STRING(20), allowNull: true },
   Foto_DPI: { type: DataTypes.TEXT("long"), allowNull: true },
 }, {
-  tableName: "Comprador",
+  tableName: "comprador",
   timestamps: false
 });
 

@@ -10,7 +10,7 @@ const Gasto = db.define("Gasto", {
 
   Id_Predio: { type: DataTypes.INTEGER, allowNull: true }
 }, {
-  tableName: "Gastos",
+  tableName: "gastos",
   timestamps: false,
 });
 
