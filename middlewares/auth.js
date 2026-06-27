@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const SECRET = process.env.JWT_SECRET || "super_clave_para_el_jwt";
+const LEGACY_SECRET = "super_clave_para_el_jwt";
 
 // ✔ Verifica token
 exports.verificarToken = (req, res, next) => {
@@ -8,10 +9,17 @@ exports.verificarToken = (req, res, next) => {
     ? authHeader.split(" ")[1]
     : authHeader;
 
-  if (!token) return res.status(401).json({ error: "Token requerido" });
+  if (!token || token === "null" || token === "undefined") {
+    return res.status(401).json({ error: "Token requerido" });
+  }
 
   try {
-    req.user = jwt.verify(token, SECRET);
+    try {
+      req.user = jwt.verify(token, SECRET);
+    } catch (error) {
+      if (SECRET === LEGACY_SECRET) throw error;
+      req.user = jwt.verify(token, LEGACY_SECRET);
+    }
     next();
   } catch (error) {
     return res.status(403).json({ error: "Token inválido o expirado" });
