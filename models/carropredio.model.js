@@ -31,7 +31,7 @@ const CarroPredio = db.define("CarroPredio", {
     allowNull: false
   },
 
-  Id_Vendedor: { type: DataTypes.INTEGER, allowNull: false },
+  Id_Vendedor: { type: DataTypes.INTEGER, allowNull: true },
   Id_Dueno_Carro: { type: DataTypes.INTEGER, allowNull: false },
   Id_Compra: { type: DataTypes.INTEGER, allowNull: true }
 
