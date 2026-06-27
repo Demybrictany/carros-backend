@@ -4,24 +4,40 @@ const path = require("path");
 
 const CarroPredio = require("../models/carropredio.model");
 const Vendedor = require("../models/vendedor.model");
+const DuenoCarro = require("../models/duenocarro.model");
+
+const nombreCompleto = (persona) => {
+  if (!persona) return "N/A";
+
+  return [persona.Nombre, persona.Apellido].filter(Boolean).join(" ") || "N/A";
+};
+
+const dpiPersona = (persona) => persona?.Dpi || persona?.DPI || "N/A";
+const telefonoPersona = (persona) => persona?.Telefono || "N/A";
 
 exports.generarContratoCompraCarro = async (req, res) => {
   try {
     const { idPredio } = req.params;
 
     const carro = await CarroPredio.findByPk(idPredio, {
-      include: [{ model: Vendedor, as: "Vendedor" }]
+      include: [
+        { model: Vendedor, as: "Vendedor", required: false },
+        { model: DuenoCarro, as: "dueno", required: false }
+      ]
     });
 
     if (!carro) {
       return res.status(404).json({ error: "Carro no encontrado" });
     }
 
-    if (!carro.Vendedor) {
-      return res.status(400).json({ error: "El carro no tiene vendedor asignado" });
+    if (!carro.dueno) {
+      return res.status(400).json({ error: "El carro no tiene dueño asignado" });
     }
 
-    const vendedor = carro.Vendedor;
+    const vendedor = carro.Vendedor || null;
+    const dueno = carro.dueno;
+    const responsable = vendedor || dueno;
+    const tipoResponsable = vendedor ? "vendedor" : "dueño";
 
     const hoy = new Date();
     const fechaActual = hoy.toLocaleDateString("es-GT");
@@ -112,13 +128,13 @@ exports.generarContratoCompraCarro = async (req, res) => {
     doc.font("Times-Roman");
 
     doc.text(
-      `Nombre: ${vendedor.Nombre || "N/A"}`
+      `Nombre: ${nombreCompleto(vendedor)}`
     );
     doc.text(
-      `DPI: ${vendedor.Dpi || "N/A"}`
+      `DPI: ${dpiPersona(vendedor)}`
     );
     doc.text(
-      `Teléfono: ${vendedor.Telefono || "N/A"}`
+      `Teléfono: ${telefonoPersona(vendedor)}`
     );
     doc.text(
       `Plazo de traspaso: ${carro.Tiempo_Traspaso || 0} días`
@@ -127,11 +143,26 @@ exports.generarContratoCompraCarro = async (req, res) => {
     doc.moveDown(1.5);
 
     // ============================
+    // DATOS DUEÑO
+    // ============================
+
+    doc.font("Times-Bold").text("DATOS DEL DUEÑO");
+    doc.moveDown(0.5);
+    doc.font("Times-Roman");
+
+    doc.text(`Nombre: ${nombreCompleto(dueno)}`);
+    doc.text(`DPI: ${dpiPersona(dueno)}`);
+    doc.text(`Teléfono: ${telefonoPersona(dueno)}`);
+    doc.text(`Dirección: ${dueno.Direccion || "N/A"}`);
+
+    doc.moveDown(1.5);
+
+    // ============================
     // CLAUSULA LEGAL
     // ============================
 
     doc.text(
-      `A partir de esta fecha yo Derick Isaac de León Ríos quedo desligado de cualquier trámite legal, alteración o problema con documentación, ya que el señor(a) ${vendedor.Nombre} asegura que dicho vehículo está totalmente en orden y que el motor y caja se encuentran en buen estado.`,
+      `A partir de esta fecha yo Derick Isaac de León Ríos quedo desligado de cualquier trámite legal, alteración o problema con documentación, ya que el señor(a) ${nombreCompleto(responsable)}, en calidad de ${tipoResponsable}, asegura que dicho vehículo está totalmente en orden y que el motor y caja se encuentran en buen estado.`,
       { align: "justify" }
     );
 
@@ -159,7 +190,7 @@ exports.generarContratoCompraCarro = async (req, res) => {
       .stroke();
 
     doc.text("Comprador", 120, yFirmas + 5);
-    doc.text("Vendedor", 380, yFirmas + 5);
+    doc.text(vendedor ? "Vendedor" : "Dueño", 380, yFirmas + 5);
 
     doc.moveDown(3);
 
