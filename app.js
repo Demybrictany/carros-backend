@@ -10,10 +10,12 @@ const app = express();
   CONFIGURACIÓN CORS
 ========================================== */
 
+
 const allowedOrigins = [
-  "http://localhost:3000", // desarrollo
-  "https://carros-backend.onrender.com", // backend
-  process.env.FRONTEND_URL // frontend en Netlify
+  "http://localhost:3000",
+  "https://puchis-import.netlify.app",
+  "https://carros-backend.onrender.com",
+  process.env.FRONTEND_URL
 ].filter(Boolean);
 
 app.use(cors({
