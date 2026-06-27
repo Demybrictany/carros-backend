@@ -1,9 +1,12 @@
 const jwt = require("jsonwebtoken");
-const SECRET = "super_clave_para_el_jwt";
+const SECRET = process.env.JWT_SECRET || "super_clave_para_el_jwt";
 
 // ✔ Verifica token
 exports.verificarToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : authHeader;
 
   if (!token) return res.status(401).json({ error: "Token requerido" });
 

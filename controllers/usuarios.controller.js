@@ -6,7 +6,8 @@ const Usuario = require("../models/usuario.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const SECRET = "super_clave_para_el_jwt"; // cámbiala en producción
+const SECRET = process.env.JWT_SECRET || "super_clave_para_el_jwt"; // cámbiala en producción
+const JWT_EXPIRES = process.env.JWT_EXPIRES || "8h";
 
 // =======================================================
 // LISTAR TODOS LOS USUARIOS (Gerente / Programador)
@@ -89,7 +90,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: user.Id_Usuario, rol: user.Rol },
       SECRET,
-      { expiresIn: "8h" }
+      { expiresIn: JWT_EXPIRES }
     );
 
     res.json({
