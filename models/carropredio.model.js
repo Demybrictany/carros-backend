@@ -32,6 +32,7 @@ const CarroPredio = db.define("CarroPredio", {
   },
 
   Id_Vendedor: { type: DataTypes.INTEGER, allowNull: false },
+  Id_Dueno_Carro: { type: DataTypes.INTEGER, allowNull: false },
   Id_Compra: { type: DataTypes.INTEGER, allowNull: true }
 
 }, {
@@ -40,3 +41,10 @@ const CarroPredio = db.define("CarroPredio", {
 });
 
 module.exports = CarroPredio;
+
+const DuenoCarro = require("./duenocarro.model");
+
+CarroPredio.belongsTo(DuenoCarro, {
+  foreignKey: "Id_Dueno_Carro",
+  as: "dueno"
+});

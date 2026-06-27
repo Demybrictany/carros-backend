@@ -53,4 +53,11 @@ const DuenoCarro = db.define(
   }
 );
 
+const CarroPredio = require("./carropredio.model");
+
+DuenoCarro.hasMany(CarroPredio, {
+  foreignKey: "Id_Dueno_Carro",
+  as: "carros"
+});
+
 module.exports = DuenoCarro;

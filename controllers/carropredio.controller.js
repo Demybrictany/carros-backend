@@ -1,6 +1,7 @@
 const Carro = require("../models/carropredio.model");
 const Vendedor = require("../models/vendedor.model");
 const Comprador = require("../models/comprador.model");
+const DuenoCarro = require("../models/duenocarro.model");
 
 // =========================
 // Obtener todos los carros
@@ -10,7 +11,8 @@ exports.obtenerCarros = async (req, res) => {
     const data = await Carro.findAll({
       include: [
         { model: Vendedor, as: "Vendedor" },
-        { model: Comprador, as: "Comprador" }
+        { model: Comprador, as: "Comprador" },
+        { model: DuenoCarro, as: "dueno" }
       ]
     });
 
@@ -50,7 +52,8 @@ exports.obtenerCarro = async (req, res) => {
     const carro = await Carro.findByPk(req.params.id, {
       include: [
         { model: Vendedor, as: "Vendedor" },
-        { model: Comprador, as: "Comprador" }
+        { model: Comprador, as: "Comprador" },
+        { model: DuenoCarro, as: "dueno" }
       ]
     });
 
@@ -81,8 +84,36 @@ exports.obtenerCarro = async (req, res) => {
 exports.crearCarro = async (req, res) => {
   try {
 
+    const {
+      Placa,
+      Modelo,
+      Anio,
+      FotoCarro,
+      Precio_Compra,
+      Vin,
+      Num_Motor,
+      Num_Chasis,
+      Color,
+      Id_Vendedor,
+      Id_Dueno_Carro,
+      Id_Compra,
+      Tiempo_Traspaso
+    } = req.body;
+
     const data = await Carro.create({
-      ...req.body,
+      Placa,
+      Modelo,
+      Anio,
+      FotoCarro,
+      Precio_Compra,
+      Vin,
+      Num_Motor,
+      Num_Chasis,
+      Color,
+      Id_Vendedor,
+      Id_Dueno_Carro,
+      Id_Compra,
+      Tiempo_Traspaso,
       Fecha_Ingreso: new Date() // 🔥 se guarda automático
     });
 
@@ -100,7 +131,12 @@ exports.crearCarro = async (req, res) => {
 // =========================
 exports.actualizarCarro = async (req, res) => {
   try {
-    await Carro.update(req.body, { where: { Id_Predio: req.params.id } });
+    const datosActualizados = {
+      ...req.body,
+      Id_Dueno_Carro: req.body.Id_Dueno_Carro
+    };
+
+    await Carro.update(datosActualizados, { where: { Id_Predio: req.params.id } });
     res.json({ mensaje: "Carro actualizado" });
   } catch (error) {
     res.status(500).json({ error: "Error al actualizar carro" });

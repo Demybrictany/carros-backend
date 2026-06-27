@@ -1,6 +1,7 @@
 const CarroPredio = require("./carropredio.model");
 const Comprador = require("./comprador.model");
 const Vendedor = require("./vendedor.model");
+const DuenoCarro = require("./duenocarro.model");
 const Colaborador = require("./colaborador.model");
 const Venta = require("./venta.model");
 const Gastos = require("./gastos.model");
@@ -16,6 +17,15 @@ Vendedor.hasMany(CarroPredio, { foreignKey: "Id_Vendedor" });
 CarroPredio.belongsTo(Comprador, { foreignKey: "Id_Compra", as: "CompradorInfo" });
 Comprador.hasMany(CarroPredio, { foreignKey: "Id_Compra" });
 
+// CarroPredio <-> DuenoCarro
+if (!CarroPredio.associations?.dueno) {
+    CarroPredio.belongsTo(DuenoCarro, { foreignKey: "Id_Dueno_Carro", as: "dueno" });
+}
+
+if (!DuenoCarro.associations?.carros) {
+    DuenoCarro.hasMany(CarroPredio, { foreignKey: "Id_Dueno_Carro", as: "carros" });
+}
+
 // Venta ↔ CarroPredio
 Venta.belongsTo(CarroPredio, { foreignKey: "Id_Predio", as: "CarroPredio" });
 CarroPredio.hasMany(Venta, { foreignKey: "Id_Predio" });
@@ -30,6 +40,7 @@ module.exports = {
     CarroPredio,
     Comprador,
     Vendedor,
+    DuenoCarro,
     Colaborador,
     Venta,
     Gastos,
