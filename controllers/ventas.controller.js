@@ -2,12 +2,12 @@
 const Venta = require("../models/venta.model");
 const CarroPredio = require("../models/carropredio.model");
 const Comprador = require("../models/comprador.model");
+const VentaColaborador = require("../models/VentaColaborador.model");
 
 const parseFechaISO = (value) => {
   if (!value || typeof value !== "string") return null;
 
-  const iso = value.match(/^\d{4}-\d{2}-\d{2}$/);
-  if (iso) return value;
+  if (value.match(/^\d{4}-\d{2}-\d{2}$/)) return value;
 
   const local = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
   if (local) {
@@ -16,6 +16,13 @@ const parseFechaISO = (value) => {
   }
 
   return null;
+};
+const calcularTotalComision = (colaboradores = []) => {
+  if (!Array.isArray(colaboradores)) return 0;
+
+  return colaboradores.reduce((total, c) => {
+    return total + Number(c.Comision || c.comision || 0);
+  }, 0);
 };
 
 const normalizeVentaPayload = (body) => {
@@ -26,55 +33,37 @@ const normalizeVentaPayload = (body) => {
     Id_Compra: Number.parseInt(body.Id_Compra, 10),
     Fecha,
     PrecioVenta: Number.parseFloat(body.PrecioVenta),
-    Porcentaje:
-      body.Porcentaje === "" || body.Porcentaje === null || body.Porcentaje === undefined
-        ? null
-        : Number.parseFloat(body.Porcentaje),
-    Comision:
-      body.Comision === "" || body.Comision === null || body.Comision === undefined
-        ? null
-        : Number.parseFloat(body.Comision),
+    Comision: calcularTotalComision(body.Colaboradores),
     DiasContrato:
-      body.DiasContrato === "" || body.DiasContrato === null || body.DiasContrato === undefined
+      body.DiasContrato === "" ||
+      body.DiasContrato === null ||
+      body.DiasContrato === undefined
         ? null
         : Number.parseInt(body.DiasContrato, 10),
   };
 };
 
-const validatePayload = (data, { partial = false } = {}) => {
-  if (!partial || data.Id_Predio !== undefined) {
-    if (!Number.isInteger(data.Id_Predio) || data.Id_Predio <= 0) {
-      return "Id_Predio invalido";
-    }
+const validatePayload = (data) => {
+  if (!Number.isInteger(data.Id_Predio) || data.Id_Predio <= 0) {
+    return "Id_Predio invalido";
   }
 
-  if (!partial || data.Id_Compra !== undefined) {
-    if (!Number.isInteger(data.Id_Compra) || data.Id_Compra <= 0) {
-      return "Id_Compra invalido";
-    }
+  if (!Number.isInteger(data.Id_Compra) || data.Id_Compra <= 0) {
+    return "Id_Compra invalido";
   }
 
-  if (!partial || data.Fecha !== undefined) {
-    if (!data.Fecha) return "Fecha invalida (use YYYY-MM-DD o DD/MM/YYYY)";
-    if (new Date(data.Fecha) > new Date()) return "La fecha no puede ser futura";
+  if (!data.Fecha) return "Fecha invalida";
+
+  if (new Date(data.Fecha) > new Date()) {
+    return "La fecha no puede ser futura";
   }
 
-  if (!partial || data.PrecioVenta !== undefined) {
-    if (!Number.isFinite(data.PrecioVenta) || data.PrecioVenta <= 0) {
-      return "PrecioVenta invalido";
-    }
+  if (!Number.isFinite(data.PrecioVenta) || data.PrecioVenta <= 0) {
+    return "PrecioVenta invalido";
   }
 
-  if (data.Porcentaje !== null && data.Porcentaje !== undefined) {
-    if (!Number.isFinite(data.Porcentaje) || data.Porcentaje < 0 || data.Porcentaje > 100) {
-      return "Porcentaje invalido";
-    }
-  }
-
-  if (data.Comision !== null && data.Comision !== undefined) {
-    if (!Number.isFinite(data.Comision) || data.Comision < 0) {
-      return "Comision invalida";
-    }
+  if (!Number.isFinite(data.Comision) || data.Comision < 0) {
+    return "Comision invalida";
   }
 
   if (data.DiasContrato !== null && data.DiasContrato !== undefined) {
@@ -86,10 +75,40 @@ const validatePayload = (data, { partial = false } = {}) => {
   return null;
 };
 
+const guardarColaboradores = async (Id_Venta, colaboradores, tx) => {
+  console.log("COLABORADORES RECIBIDOS:", colaboradores);
+
+  if (!Array.isArray(colaboradores)) return;
+
+  for (const c of colaboradores) {
+    const idColaborador = c.Id_Colaborador || c.id_colaborador;
+    const comision = c.Comision || c.comision;
+    const rol = c.Rol || c.rol || "Vendedor";
+
+    if (!idColaborador) continue;
+
+    await VentaColaborador.create(
+      {
+        Id_Venta: Number.parseInt(Id_Venta, 10),
+        Id_Colaborador: Number.parseInt(idColaborador, 10),
+        Rol: rol,
+        Comision: Number.parseFloat(comision || 0),
+      },
+      { transaction: tx }
+    );
+  }
+};
+
 const buildVentasInclude = () => {
   const include = [];
   if (Venta.associations?.Carro) include.push({ association: "Carro" });
   if (Venta.associations?.Comprador) include.push({ association: "Comprador" });
+  if (Venta.associations?.venta_colaborador) {
+    include.push({
+      association: "venta_colaborador",
+      attributes: ["Id_Colaborador", "Rol", "Comision"],
+    });
+  }
   return include;
 };
 
@@ -103,7 +122,10 @@ exports.obtenerVentas = async (req, res) => {
     res.json(ventas);
   } catch (error) {
     console.error("Error en obtenerVentas:", error);
-    res.status(500).json({ error: "Error al obtener ventas", detalle: error.message });
+    res.status(500).json({
+      error: "Error al obtener ventas",
+      detalle: error.message,
+    });
   }
 };
 
@@ -111,6 +133,9 @@ exports.crearVenta = async (req, res) => {
   const tx = await sequelize.transaction();
 
   try {
+    console.log("========== BODY RECIBIDO ==========");
+    console.log(JSON.stringify(req.body, null, 2));
+
     const data = normalizeVentaPayload(req.body);
 
     const validationError = validatePayload(data);
@@ -123,6 +148,7 @@ exports.crearVenta = async (req, res) => {
       transaction: tx,
       lock: tx.LOCK.UPDATE,
     });
+
     if (!carro) {
       await tx.rollback();
       return res.status(404).json({ error: "Carro no existe" });
@@ -133,13 +159,22 @@ exports.crearVenta = async (req, res) => {
       return res.status(400).json({ error: "Este carro ya tiene comprador" });
     }
 
-    const comprador = await Comprador.findByPk(data.Id_Compra, { transaction: tx });
+    const comprador = await Comprador.findByPk(data.Id_Compra, {
+      transaction: tx,
+    });
+
     if (!comprador) {
       await tx.rollback();
       return res.status(404).json({ error: "Comprador no existe" });
     }
 
     const venta = await Venta.create(data, { transaction: tx });
+
+    await guardarColaboradores(
+      venta.Id_Venta,
+      req.body.Colaboradores,
+      tx
+    );
 
     carro.Id_Compra = data.Id_Compra;
     await carro.save({ transaction: tx });
@@ -149,13 +184,6 @@ exports.crearVenta = async (req, res) => {
   } catch (error) {
     await tx.rollback();
     console.error("Error al crear venta:", error);
-
-    if (error?.name === "SequelizeForeignKeyConstraintError") {
-      return res.status(400).json({
-        error: "No se puede guardar la venta por llaves foraneas",
-        detalle: error.parent?.sqlMessage || error.message,
-      });
-    }
 
     res.status(500).json({
       error: "Error al crear venta",
@@ -169,7 +197,11 @@ exports.actualizarVenta = async (req, res) => {
 
   try {
     const id = req.params.id;
-    const venta = await Venta.findByPk(id, { transaction: tx, lock: tx.LOCK.UPDATE });
+
+    const venta = await Venta.findByPk(id, {
+      transaction: tx,
+      lock: tx.LOCK.UPDATE,
+    });
 
     if (!venta) {
       await tx.rollback();
@@ -181,12 +213,11 @@ exports.actualizarVenta = async (req, res) => {
       Id_Compra: req.body.Id_Compra ?? venta.Id_Compra,
       Fecha: req.body.Fecha ?? venta.Fecha,
       PrecioVenta: req.body.PrecioVenta ?? venta.PrecioVenta,
-      Porcentaje: req.body.Porcentaje ?? venta.Porcentaje,
-      Comision: req.body.Comision ?? venta.Comision,
+      Colaboradores: req.body.Colaboradores || [],
       DiasContrato: req.body.DiasContrato ?? venta.DiasContrato,
     });
 
-    const validationError = validatePayload(payload, { partial: true });
+    const validationError = validatePayload(payload);
     if (validationError) {
       await tx.rollback();
       return res.status(400).json({ error: validationError });
@@ -199,6 +230,7 @@ exports.actualizarVenta = async (req, res) => {
       transaction: tx,
       lock: tx.LOCK.UPDATE,
     });
+
     if (!carroDestino) {
       await tx.rollback();
       return res.status(404).json({ error: "Carro destino no existe" });
@@ -206,22 +238,38 @@ exports.actualizarVenta = async (req, res) => {
 
     if (nuevoPredio !== prevPredio && carroDestino.Id_Compra !== null) {
       await tx.rollback();
-      return res.status(400).json({ error: "El carro destino ya tiene comprador" });
+      return res.status(400).json({
+        error: "El carro destino ya tiene comprador",
+      });
     }
 
-    const comprador = await Comprador.findByPk(payload.Id_Compra, { transaction: tx });
+    const comprador = await Comprador.findByPk(payload.Id_Compra, {
+      transaction: tx,
+    });
+
     if (!comprador) {
       await tx.rollback();
       return res.status(404).json({ error: "Comprador no existe" });
     }
 
-    await Venta.update(payload, { where: { Id_Venta: id }, transaction: tx });
+    await Venta.update(payload, {
+      where: { Id_Venta: id },
+      transaction: tx,
+    });
+
+    await VentaColaborador.destroy({
+      where: { Id_Venta: id },
+      transaction: tx,
+    });
+
+    await guardarColaboradores(id, req.body.Colaboradores, tx);
 
     if (nuevoPredio !== prevPredio) {
       const carroAnterior = await CarroPredio.findByPk(prevPredio, {
         transaction: tx,
         lock: tx.LOCK.UPDATE,
       });
+
       if (carroAnterior) {
         carroAnterior.Id_Compra = null;
         await carroAnterior.save({ transaction: tx });
@@ -236,6 +284,7 @@ exports.actualizarVenta = async (req, res) => {
   } catch (error) {
     await tx.rollback();
     console.error("Error al actualizar venta:", error);
+
     res.status(500).json({
       error: "Error al actualizar venta",
       detalle: error.message,
@@ -248,7 +297,11 @@ exports.eliminarVenta = async (req, res) => {
 
   try {
     const id = req.params.id;
-    const venta = await Venta.findByPk(id, { transaction: tx, lock: tx.LOCK.UPDATE });
+
+    const venta = await Venta.findByPk(id, {
+      transaction: tx,
+      lock: tx.LOCK.UPDATE,
+    });
 
     if (!venta) {
       await tx.rollback();
@@ -259,18 +312,31 @@ exports.eliminarVenta = async (req, res) => {
       transaction: tx,
       lock: tx.LOCK.UPDATE,
     });
+
     if (carro) {
       carro.Id_Compra = null;
       await carro.save({ transaction: tx });
     }
 
-    await Venta.destroy({ where: { Id_Venta: id }, transaction: tx });
+    await VentaColaborador.destroy({
+      where: { Id_Venta: id },
+      transaction: tx,
+    });
+
+    await Venta.destroy({
+      where: { Id_Venta: id },
+      transaction: tx,
+    });
 
     await tx.commit();
     res.json({ mensaje: "Venta eliminada" });
   } catch (error) {
     await tx.rollback();
     console.error("Error al eliminar venta:", error);
-    res.status(500).json({ error: "Error al eliminar venta", detalle: error.message });
+
+    res.status(500).json({
+      error: "Error al eliminar venta",
+      detalle: error.message,
+    });
   }
 };

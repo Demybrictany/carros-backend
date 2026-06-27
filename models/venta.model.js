@@ -28,11 +28,6 @@ const Venta = db.define(
       allowNull: false,
       validate: { min: 0 },
     },
-    Porcentaje: {
-      type: DataTypes.DECIMAL(5, 2),
-      allowNull: true,
-      validate: { min: 0, max: 100 },
-    },
     Comision: {
       type: DataTypes.DECIMAL(12, 2),
       allowNull: true,
@@ -51,3 +46,10 @@ const Venta = db.define(
 );
 
 module.exports = Venta;
+
+const VentaColaborador = require("./VentaColaborador.model");
+
+Venta.hasMany(VentaColaborador, {
+  foreignKey: "Id_Venta",
+  as: "venta_colaborador",
+});

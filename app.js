@@ -46,7 +46,8 @@ require("./models/carropredio.model");
 require("./models/gastos.model");
 require("./models/venta.model");
 require("./models/usuario.model");
-
+require("./models/VentaColaborador.model");
+require("./models/duenocarro.model");
 /* ==========================================
   RELACIONES
 ========================================== */
@@ -75,6 +76,7 @@ app.use("/contrato", require("./routes/contrato.routes"));
 app.use("/usuarios", require("./routes/usuarios.routes"));
 app.use("/estadisticas", require("./routes/estadisticas.routes"));
 app.use("/contrato-compra-carro", require("./routes/contratoCompraCarro.routes"));
+app.use("/dueno-carro", require("./routes/duenocarro.routes"));
 app.use("/", require("./routes/buscar.routes"));
 
 /* ==========================================
