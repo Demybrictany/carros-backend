@@ -158,6 +158,9 @@ exports.generarContrato = async (req, res) => {
     const chasis = fixMojibake(carro.Num_Chasis ?? "");
     const motor = fixMojibake(carro.Num_Motor ?? "");
     const color = fixMojibake(carro.Color ?? "");
+    const fechaCompra = fechaIngreso && !Number.isNaN(fechaIngreso.getTime())
+      ? fechaIngreso.toLocaleDateString("es-GT")
+      : "N/A";
 
     const nombreComprador = fixMojibake(comprador.Nombre ?? "");
     const apellidoComprador = fixMojibake(comprador.Apellido ?? "");
@@ -166,34 +169,58 @@ exports.generarContrato = async (req, res) => {
     const nombreDueno = fixMojibake(dueno?.Nombre ?? "");
     const apellidoDueno = fixMojibake(dueno?.Apellido ?? "");
     const dpiDueno = fixMojibake(dueno?.DPI ?? dueno?.Dpi ?? "No registrado");
-
-    const nombreVendedor = fixMojibake(vendedor?.Nombre ?? "");
-    const apellidoVendedor = fixMojibake(vendedor?.Apellido ?? "");
-    const dpiVendedor = fixMojibake(vendedor?.Dpi ?? vendedor?.DPI ?? "No registrado");
+    const telefonoDueno = fixMojibake(dueno?.Telefono ?? "No registrado");
+    const direccionDueno = fixMojibake(dueno?.Direccion ?? "No registrada");
 
     const nombreResponsable = fixMojibake(responsable.Nombre ?? "");
     const apellidoResponsable = fixMojibake(responsable.Apellido ?? "");
-    const datosVendedor = vendedor
-      ? `Vendedor: ${nombreVendedor} ${apellidoVendedor}, quien se identifica con número de DPI ${dpiVendedor}. `
-      : "";
     const firmaResponsable = vendedor ? "Vendedor" : "Dueño";
+
+    const imprimirBloqueDatos = (titulo, filas) => {
+      doc.font("Times-Bold").fontSize(11).text(titulo);
+      doc.moveDown(0.25);
+
+      filas.forEach(([etiqueta, valor]) => {
+        doc.font("Times-Roman").fontSize(10.5).text(`${etiqueta}: ${valor || "N/A"}`);
+      });
+
+      doc.moveDown(0.65);
+    };
 
     doc
       .font("Times-Roman")
       .fontSize(12)
       .text(
-        `Por medio de la presente Yo ${gerenteNombre}, con número de DPI ${gerenteDpi}, hago entrega del vehículo:\n\n` +
-          `Marca/Modelo: ${modelo}\n` +
-          `Año: ${carro.Anio}\n` +
-          `Placas: ${placa}\n` +
-          `Chasis: ${chasis}\n` +
-          `Número de motor: ${motor}\n` +
-          `Color: ${color}\n\n` +
-          `El cual se encuentra a nombre de ${nombreDueno} ${apellidoDueno}, quien se identifica con número de DPI ${dpiDueno}. ` +
-          datosVendedor +
-          `Se entrega el vehículo con todos sus accesorios, incluyendo tarjeta de circulación, título, llave y DPI.\n\n`,
+        `Por medio de la presente Yo ${gerenteNombre}, con número de DPI ${gerenteDpi}, hago entrega del vehículo descrito a continuación:`,
         { align: "justify" }
-        
+      );
+
+    doc.moveDown(0.8);
+
+    imprimirBloqueDatos("DATOS DEL VEHÍCULO", [
+      ["Modelo", modelo],
+      ["Placa", placa],
+      ["No. Motor", motor],
+      ["Color", color],
+      ["No. Chasis", chasis],
+      ["Fecha de compra", fechaCompra],
+    ]);
+
+    if (vendedor) {
+      imprimirBloqueDatos("DATOS DEL DUEÑO", [
+        ["Nombre", `${nombreDueno} ${apellidoDueno}`.trim()],
+        ["DPI", dpiDueno],
+        ["Teléfono", telefonoDueno],
+        ["Dirección", direccionDueno],
+      ]);
+    }
+
+    doc
+      .font("Times-Roman")
+      .fontSize(12)
+      .text(
+        `Se entrega el vehículo con todos sus accesorios, incluyendo tarjeta de circulación, título, llave y DPI.\n\n`,
+        { align: "justify" }
       );
 
     doc.text(
@@ -232,4 +259,5 @@ exports.generarContrato = async (req, res) => {
     });
   }
 };
+
 
