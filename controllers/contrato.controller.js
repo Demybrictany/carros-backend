@@ -10,10 +10,20 @@ const buildVentaInclude = () => {
   const addCarroInclude = (associationName) => {
     const includeItem = { association: associationName };
 
-    // Si el modelo tiene una asociación con Vendedor, la incluimos para poder usarla en el contrato
+    // Si el modelo tiene asociaciones con vendedor o dueno, las incluimos para poder usarlas en el contrato
     const assoc = Venta.associations?.[associationName];
+    const carroIncludes = [];
+
     if (assoc?.target?.associations?.Vendedor) {
-      includeItem.include = [{ association: "Vendedor" }];
+      carroIncludes.push({ association: "Vendedor", required: false });
+    }
+
+    if (assoc?.target?.associations?.dueno) {
+      carroIncludes.push({ association: "dueno", required: false });
+    }
+
+    if (carroIncludes.length > 0) {
+      includeItem.include = carroIncludes;
     }
 
     return includeItem;
@@ -72,6 +82,8 @@ exports.generarContrato = async (req, res) => {
     const carro = venta.Carro || venta.CarroVenta || null;
     const comprador = venta.Comprador || null;
     const vendedor = carro?.Vendedor || null;
+    const dueno = carro?.dueno || null;
+    const responsable = vendedor || dueno;
 
     if (!carro) {
       return res.status(400).json({
@@ -85,9 +97,9 @@ exports.generarContrato = async (req, res) => {
       });
     }
 
-    if (!vendedor) {
+    if (!responsable) {
       return res.status(400).json({
-        error: "La venta no tiene vendedor asociado (vendedor del carro no está cargado)",
+        error: "La venta no tiene vendedor ni dueño asociado",
       });
     }
 
@@ -151,9 +163,20 @@ exports.generarContrato = async (req, res) => {
     const apellidoComprador = fixMojibake(comprador.Apellido ?? "");
     const dpiComprador = fixMojibake(comprador.DPI ?? "");
 
-    const nombreVendedor = fixMojibake(vendedor.Nombre ?? "");
-    const apellidoVendedor = fixMojibake(vendedor.Apellido ?? "");
-    const dpiVendedor = fixMojibake(vendedor.Dpi ?? vendedor.DPI ?? "No registrado");
+    const nombreDueno = fixMojibake(dueno?.Nombre ?? "");
+    const apellidoDueno = fixMojibake(dueno?.Apellido ?? "");
+    const dpiDueno = fixMojibake(dueno?.DPI ?? dueno?.Dpi ?? "No registrado");
+
+    const nombreVendedor = fixMojibake(vendedor?.Nombre ?? "");
+    const apellidoVendedor = fixMojibake(vendedor?.Apellido ?? "");
+    const dpiVendedor = fixMojibake(vendedor?.Dpi ?? vendedor?.DPI ?? "No registrado");
+
+    const nombreResponsable = fixMojibake(responsable.Nombre ?? "");
+    const apellidoResponsable = fixMojibake(responsable.Apellido ?? "");
+    const datosVendedor = vendedor
+      ? `Vendedor: ${nombreVendedor} ${apellidoVendedor}, quien se identifica con número de DPI ${dpiVendedor}. `
+      : "";
+    const firmaResponsable = vendedor ? "Vendedor" : "Dueño";
 
     doc
       .font("Times-Roman")
@@ -166,7 +189,8 @@ exports.generarContrato = async (req, res) => {
           `Chasis: ${chasis}\n` +
           `Número de motor: ${motor}\n` +
           `Color: ${color}\n\n` +
-          `El cual se encuentra a nombre de ${nombreVendedor} ${apellidoVendedor}, quien se identifica con número de DPI ${dpiVendedor}. ` +
+          `El cual se encuentra a nombre de ${nombreDueno} ${apellidoDueno}, quien se identifica con número de DPI ${dpiDueno}. ` +
+          datosVendedor +
           `Se entrega el vehículo con todos sus accesorios, incluyendo tarjeta de circulación, título, llave y DPI.\n\n`,
         { align: "justify" }
         
@@ -175,7 +199,7 @@ exports.generarContrato = async (req, res) => {
     doc.text(
       `Yo ${nombreComprador} ${apellidoComprador}, con número de DPI ${dpiComprador}, acepto el vehículo en el estado en que se encuentra. ` +
         `Sin hacer responsable a Puchys Imports ni a su gerente ${gerenteNombre}, quien se identifica con DPI ${gerenteDpi}, ` +
-        `por fallas en motor, caja, suspensión o cualquier otra avería tras revisión mecánica.\n\n`,
+        `por fallas en motor, caja, suspensión o cualquier otra avería tras revisión mecánica. ${nombreResponsable} ${apellidoResponsable} asume los riesgos y responsabilidades correspondientes.\n\n`,
       { align: "justify" }
     );
 
@@ -196,7 +220,7 @@ exports.generarContrato = async (req, res) => {
     doc.moveTo(330, yFirmas).lineTo(500, yFirmas).stroke();
 
     doc.text("Cliente", 130, yFirmas + 5);
-    doc.text("Gerente", 390, yFirmas + 5);
+    doc.text(firmaResponsable, 390, yFirmas + 5);
 
     doc.end();
   } catch (error) {
@@ -208,3 +232,4 @@ exports.generarContrato = async (req, res) => {
     });
   }
 };
+
