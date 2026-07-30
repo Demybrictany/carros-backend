@@ -80,7 +80,6 @@ app.use("/estadisticas", require("./routes/estadisticas.routes"));
 app.use("/contrato-compra-carro", require("./routes/contratoCompraCarro.routes"));
 app.use("/dueno-carro", require("./routes/duenocarro.routes"));
 app.use("/", require("./routes/buscar.routes"));
-
 /* ==========================================
   SERVIDOR
 ========================================== */
